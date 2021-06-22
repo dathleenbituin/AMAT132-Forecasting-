@@ -22,7 +22,7 @@ rm(list=ls())
 #import data
 
 library(readxl)
-hdata <- read_excel("hdata.xlsx")
+hdata <- read_excel("House price prediction/hdata.xlsx")
 View(hdata)
 
 ################################################################################
@@ -50,7 +50,7 @@ pairs(house_data [1:7])
 #check the correlation
 cor(house_data)
 cr<-cor(house_data)
-corrplot(cr, method = "number")
+corrplot(cr)
 
 ################################################################################
 ### Model Building
@@ -64,6 +64,7 @@ vdata <- house_data [ind==2,]
 model1<-lm(price ~ bedrooms + bathrooms + sqft_living + floors + condition 
            + grade,data=tdata)
 summary(model1)
+
 par(mfrow=c(2,2)) 
 plot(model1)
 bptest(model1) # test for heteroskesdasticity
@@ -73,6 +74,7 @@ bgtest(model1) # test for auto-correlation
 model2<-lm(log(price) ~ bedrooms + bathrooms + sqft_living + floors 
            + condition + grade, data=tdata)
 summary(model2)
+
 bptest(model2) # test for heteroskesdasticity
 bgtest(model2) # test for auto-correlation
 par(mfrow=c(2,2)) 
@@ -82,6 +84,7 @@ plot(model2)
 model3<-lm(log(price) ~ bedrooms + bathrooms + I(bathrooms^2) + sqft_living 
            + condition + grade + floors, data=tdata)
 summary(model3)
+
 bptest(model3) # test for heteroskesdasticity
 bgtest(model3) # test for auto-correlation
 par(mfrow=c(2,2)) 
