@@ -77,7 +77,6 @@ cbind("Monthly House Price Index" = Y,
   xlab("Year") + ylab("") +
   ggtitle("Monthly HPI in ENCD")
 
-
 # We will investigate seasonality 
 
 #Create seasonal ploy
@@ -89,38 +88,39 @@ ggseasonplot(DDL, year.labels=TRUE, year.labels.left=TRUE) +
 ggsubseriesplot(DDL) 
 
 ##############################################################################
-#Forecasting using Snaive, Exponential Smoothing and ARIMA 
+# Forecasting using Snaive, Exponential Smoothing and ARIMA 
 
-#Seasnoal Naive method as our benchmark
+# Seasnoal Naive method as our benchmark
 fit <-snaive(DDL) #rs: 0.012 
 print(summary(fit))
 checkresiduals(fit) 
 
 
-
-#####
-# Fit ets method
-#####
+# Fit an Exponential Smoothing Model
 fit_ets <- ets(Y)
 print(summary(fit_ets))
 checkresiduals(fit_ets)
 
 
-#residual sd: 0.0062 / 0.0059
-##########
 # fit an ARIMA Model
-######
-
-fit_arima <- auto.arima(L, d=1, D=1,stepwise = FALSE, approximation = FALSE, trace = TRUE)
+fit_arima <- auto.arima(L, d=1, D=1,stepwise = FALSE, approximation = FALSE, 
+  trace = TRUE)
 print(summary(fit_arima))
 checkresiduals(fit_arima)
 
-sqrt(0.8426)
-sqrt(0.7812) #rs: 0.8838552
-sqrt(3.113e-05) #rs : 0.005579426
-#residual : 0.9179325
-###########
-#forecast with Arima model
+# Since ARIMA has the lowest residuals,
+# We will forecast using ARIMA Model
+
+########################################################################################
+#### Forecasting using ARIMA Model
+
 fcst<- forecast(fit_arima, h=24)
+
+#Time plots with the forecasting value for 24 months
 autoplot(fcst, include=180)
+
+#Summary results
 print(summary(fcst))
+
+#######################################################################################
+#end
