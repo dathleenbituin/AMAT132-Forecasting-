@@ -1,3 +1,4 @@
+rm(list=ls())
 ################################################################################
 #   TITLE: House Price Prediction using Multiple Regression 
 #   AUTHOR: DATHLEEN BITUIN M. SATUR
@@ -123,3 +124,6 @@ AICs <- c(AIC(model1),AIC(model2),AIC(model3))
 Adj_R_squared <- c(summary(model1)$adj.r.squared, summary(model2)$adj.r.squared, 
                    summary(model3)$adj.r.squared)
 cbind(MAPE,RMSE,AICs,Adj_R_squared)
+
+#############################################################################
+#end
