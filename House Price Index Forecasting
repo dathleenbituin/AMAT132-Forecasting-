@@ -78,31 +78,23 @@ cbind("Monthly House Price Index" = Y,
   ggtitle("Monthly HPI in ENCD")
 
 
+# We will investigate seasonality 
 
-
-####################
-#Season plot
-
-# investigate seasonality 
-ggseasonplot(DDL, year.labels=TRUE, year.labels.left=TRUE) + ggtitle("Seasonal plot: monthly housing index prices for ENCD") +
+#Create seasonal ploy
+ggseasonplot(DDL, year.labels=TRUE, year.labels.left=TRUE) + 
+  ggtitle("Seasonal plot: monthly housing index prices for ENCD") +
   ylab("Housing price index")
 
-#Subseries plot
-
-#subseries plot
+#Create subseries plot
 ggsubseriesplot(DDL) 
 
-#########################
-#Forecasting using different methods
-##################################
-#use seasonal naive method as our benchmark
-# y_t = y_{t-s} + e_t
-####
+##############################################################################
+#Forecasting using Snaive, Exponential Smoothing and ARIMA 
 
+#Seasnoal Naive method as our benchmark
 fit <-snaive(DDL) #rs: 0.012 
 print(summary(fit))
 checkresiduals(fit) 
-#residual sd = 1.7891 / 1.7788
 
 
 
