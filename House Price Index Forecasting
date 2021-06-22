@@ -1,0 +1,116 @@
+rm(list=ls())
+###################################################
+#Time Series 
+##########
+
+
+library(fpp2)
+library(tidyverse)
+
+#Obtaining the data
+library(readxl)
+HPI_master <- read_excel("HPI_master.xlsx")
+View(HPI_master)
+
+
+########
+#Data Cleaning 
+
+head(HPI_master)
+unique(HPI_master$frequency)
+
+quarterly <- HPI_master %>% filter(frequency == "quarterly")
+monthly <- HPI_master %>% filter(frequency == "monthly")
+
+unique(monthly$place_name)
+head(unique(quarterly$place_name))
+
+north_monthly <- monthly %>% filter(place_name == "East North Central Division")
+View(north_monthly)
+
+
+###############
+#Explanataroy Data Analysis
+#Time Plots
+Y <- ts(north_monthly[, 9], start = c(1991,1), frequency = 12)
+
+autoplot(Y) +
+  ggtitle("Monthly housing index times series ENCD")+
+  ylab("Housing Price Index")+xlab("Year")
+
+############
+#We will perform log transformation, seasonal differencing and doubly differencing 
+
+cbind("Monthly House Price Index" = Y,
+      "Logs" = log(Y),
+      "Seasonally\n differenced logs" =
+        diff(log(Y),12),
+      "Doubly\n differenced logs" =
+        diff(diff(log(Y),12),1)) %>%
+  autoplot(facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Monthly HPI in ENCD")
+
+#############
+#log transforming our data
+L<-log(Y)
+#############
+
+#First differencing
+DL<- diff(log(Y), 12)
+
+# seasonal differencing
+DDL <-diff(diff(log(Y), 12), 1)
+
+####################
+#Season plot
+
+# investigate seasonality 
+ggseasonplot(DDL, year.labels=TRUE, year.labels.left=TRUE) + ggtitle("Seasonal plot: monthly housing index prices for ENCD") +
+  ylab("Housing price index")
+
+#Subseries plot
+
+#subseries plot
+ggsubseriesplot(DDL) 
+
+#########################
+#Forecasting using different methods
+##################################
+#use seasonal naive method as our benchmark
+# y_t = y_{t-s} + e_t
+####
+
+fit <-snaive(DDL) #rs: 0.012 
+print(summary(fit))
+checkresiduals(fit) 
+#residual sd = 1.7891 / 1.7788
+
+
+
+#####
+# Fit ets method
+#####
+fit_ets <- ets(Y)
+print(summary(fit_ets))
+checkresiduals(fit_ets)
+
+
+#residual sd: 0.0062 / 0.0059
+##########
+# fit an ARIMA Model
+######
+
+fit_arima <- auto.arima(L, d=1, D=1,stepwise = FALSE, approximation = FALSE, trace = TRUE)
+print(summary(fit_arima))
+checkresiduals(fit_arima)
+
+sqrt(0.8426)
+sqrt(0.7812) #rs: 0.8838552
+sqrt(3.113e-05) #rs : 0.005579426
+#residual : 0.9179325
+###########
+#forecast with Arima model
+fcst<- forecast(fit_arima, h=24)
+autoplot(fcst, include=180)
+print(summary(fcst))
